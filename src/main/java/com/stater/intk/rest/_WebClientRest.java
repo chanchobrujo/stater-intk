@@ -1,50 +1,74 @@
 package com.stater.intk.rest;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import static java.util.Objects.nonNull;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
-import static org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
+import static org.springframework.web.reactive.function.BodyInserters.fromFormData;
+import static org.springframework.web.reactive.function.client.WebClient.*;
 
 @Service
 @RequiredArgsConstructor
 public abstract class _WebClientRest {
-    @Setter
-    private WebClient webClient;
+    private final WebClient webClient = builder()
+            .build();
 
-    public ResponseSpec defaultGenericWebClient(String method, String URI, Object request) {
+    private RequestBodySpec getMethod(String method, String URI) {
         method = method.toUpperCase();
-        RequestHeadersSpec<?> httpMethod;
-
+        RequestBodyUriSpec _method = this.webClient.post();
         switch (method) {
             case "POST": {
-                httpMethod = this.webClient
-                        .post()
-                        .uri(URI)
-                        .contentType(APPLICATION_JSON)
-                        .bodyValue(request);
+                _method = this.webClient.post();
                 break;
             }
             case "PUT": {
-                httpMethod = this.webClient
-                        .put()
-                        .uri(URI)
-                        .contentType(APPLICATION_JSON)
-                        .bodyValue(request);
+                _method = this.webClient.put();
                 break;
             }
-            default: {
-                httpMethod = this.webClient
-                        .get()
-                        .uri(URI)
-                        .accept(APPLICATION_JSON);
+            case "PATCH": {
+                _method = this.webClient.patch();
                 break;
             }
         }
+        return _method.uri(URI)
+                .contentType(APPLICATION_JSON);
+    }
 
-        return httpMethod.retrieve();
+    private RequestHeadersSpec<?> setToken(RequestHeadersSpec<?> _methodBody, String token) {
+        if (nonNull(token)) {
+            _methodBody = _methodBody
+                    .header(AUTHORIZATION, token);
+        }
+        return _methodBody;
+    }
+
+    public ResponseSpec defaultGenericWebClientGet(String URI, String token) {
+        RequestHeadersSpec<?> getMethod = this.webClient
+                .get()
+                .uri(URI);
+        return this.setToken(getMethod, token)
+                .accept(APPLICATION_JSON)
+                .retrieve();
+    }
+
+    public ResponseSpec defaultGenericWebClient(String method, String URI, Object request, String token) {
+        RequestHeadersSpec<?> _methodBody = this.getMethod(method, URI)
+                .bodyValue(request);
+        return this.setToken(_methodBody, token)
+                .accept(APPLICATION_JSON)
+                .retrieve();
+    }
+
+    public ResponseSpec defaultGenericWebClient(String method, String URI, MultiValueMap<String, String> request, String token) {
+        RequestHeadersSpec<?> _methodBody = this.getMethod(method, URI)
+                .body(fromFormData(request));
+        return this.setToken(_methodBody, token)
+                .accept(APPLICATION_FORM_URLENCODED)
+                .retrieve();
     }
 }

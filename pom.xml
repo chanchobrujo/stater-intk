@@ -6,7 +6,7 @@
 
     <groupId>com.stater.intk</groupId>
     <artifactId>intk-utils</artifactId>
-    <version>0.6.5</version>
+    <version>0.7</version>
 
     <properties>
         <spring.boot.version>3.3.5</spring.boot.version>
@@ -27,6 +27,11 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-authorization-server</artifactId>
+            <version>1.0.1</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>

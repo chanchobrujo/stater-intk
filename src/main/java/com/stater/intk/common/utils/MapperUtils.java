@@ -1,15 +1,19 @@
-package com.stater.intk.util;
+package com.stater.intk.common.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.stater.intk.model.adapter.InstantTypeAdapter;
+import com.stater.intk.model.adapter.LocalDateTimeTypeAdapter;
 import com.stater.intk.model.adapter.LocalDateTypeAdapter;
+import com.stater.intk.model.adapter.OffsetDateTimeAdapter;
 import com.stater.intk.model.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import static java.util.Objects.isNull;
 
@@ -21,6 +25,8 @@ public class MapperUtils {
     private final static Gson gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
             .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
+            .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeAdapter())
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
             .create();
 
     public static <T> T objectToObject(Object value, Type valueType) {
